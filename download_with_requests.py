@@ -1,4 +1,5 @@
-import gdown
+import requests
+import shutil
 import csv
 import os
 i = {
@@ -18,6 +19,14 @@ i = {
     'integrantesAPartirDe': 21
 
 }
+
+def download_file(url, name):
+    with requests.get(url, stream=True) as r:
+        with open(name, 'wb') as f:
+        #with open(f"url.split('=')[-1] + '.mp4'", 'wb') as f:
+            shutil.copyfileobj(r.raw, f)
+    return name
+
 def adjustURLForDownload(url):
     if 'view' in url:
         indiceInicial = url.index('/d/') + 3
@@ -61,16 +70,20 @@ with open(r'dados.csv', encoding='utf-8') as csvfile:
             #cria arquivo com titulo, integrantes etc
             if not os.path.exists(f'grupos/{tituloProjeto}/dados.txt'): 
                 arquivo = open(f'grupos/{tituloProjeto}/dados.txt', 'w')
+                arquivo.writelines(f'{montaEquipe(linha)}\n\n')
+                arquivo.writelines(f'Professores: {i["profs"]}\n\n')
+                arquivo.writelines(f'Descrição: {i["descricao"]}')
                 print ('**********************')
+            if not os.path.exist(f'grupos/{tituloProjeto}/video.mp4'):
                 #download do video
                 url = linha[i['link1']] if len( linha[i['link1']]) >=2 else  linha[i['link2']]
                 if len(url) >=2 and isGoogleDriveLink(url):
+                    print (linha[i["tituloProj"]])
                     print(url)
-                    adjustedURL = adjustURLForDownload(url)
-                    print (adjustedURL)
-                    arquivo.writelines (url)
-                    arquivo.writelines ('\n')
-                    arquivo.writelines (adjustedURL)
-                    gdown.download (url=adjustedURL, output=f'grupos/{tituloProjeto}/video.mp4', quiet=False)
+                    print (adjustURLForDownload(url))
+                    download_file (adjustURLForDownload(url),f'grupos/{tituloProjeto}/video.mp4')
         except Exception as e:
             print (e)
+
+
+
