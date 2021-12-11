@@ -68,67 +68,71 @@ def temVideo (linha):
 
 def tratarSomenteQuemTemVideo ():
     with open(r'dados.csv', encoding='utf-8') as csvfile:
-        cont = 0
+        cont = 1
         leitor = csv.reader(csvfile, delimiter=',')
         for linha in leitor:
-            if (temVideo(linha) and temPermissao(linha)):
-                try:    
-                    #criar pasta para esse grupo
-                    tituloProjeto = f'{linha[i["tituloProj"]].strip().replace(":", "-")}'
-                    tituloProjeto = tituloProjeto.replace('"', '').replace('|', '-').replace('/','-').replace('*','.')
-                    if not os.path.exists(f'grupos/{tituloProjeto}'):
-                        os.makedirs(f'grupos/{tituloProjeto}')
-                    #cria arquivo com titulo, integrantes etc
-                    if not os.path.exists(f'grupos/{tituloProjeto}/dados.txt'): 
-                        arquivo = open(f'grupos/{tituloProjeto}/dados.txt', 'w', encoding='UTF-8')
-                        arquivo.writelines(f'{montaEquipe(linha)}\n\n')
-                        arquivo.writelines(f'Professores: {linha[i["profs"]]}\n\n')
-                        arquivo.writelines(f'Descrição: {linha[i["descricao"]]}')
-                        print ('**********************')
-                    if not os.path.exists(f'grupos/{tituloProjeto}/video.mp4'):
-                        #download do video
-                        url = linha[i['link1']] if len( linha[i['link1']]) >=2 else  linha[i['link2']]
-                        if len(url) >=2 and isGoogleDriveLink(url):
-                            print (linha[i["tituloProj"]])
-                            print(url)
-                            print (adjustURLForDownload(url))
-                            download_file (adjustURLForDownload(url),f'grupos/{tituloProjeto}/video.mp4')
-                except Exception as e:
-                    print (e)
-
-def tratarSomenteQuemNaoTemVideo ():
-    with open(r'dados.csv', encoding='utf-8') as csvfile:
-            cont = 0
-            leitor = csv.reader(csvfile, delimiter=',')
-            for linha in leitor:
-                if (not temVideo(linha) and temPermissao(linha)):
+            if cont > 300:
+                if (temVideo(linha) and temPermissao(linha)):
                     try:    
                         #criar pasta para esse grupo
                         tituloProjeto = f'{linha[i["tituloProj"]].strip().replace(":", "-")}'
                         tituloProjeto = tituloProjeto.replace('"', '').replace('|', '-').replace('/','-').replace('*','.')
-                        if not os.path.exists(f'grupos/{tituloProjeto}'):
-                            os.makedirs(f'grupos/{tituloProjeto}')
+                        if not os.path.exists(f'grupos'):
+                            os.makedirs(f'grupos')
                         #cria arquivo com titulo, integrantes etc
-                        if not os.path.exists(f'grupos/{tituloProjeto}/dados.txt'): 
-                            arquivo = open(f'grupos/{tituloProjeto}/dados.txt', 'w', encoding='UTF-8')
+                        if not os.path.exists(f'grupos/{tituloProjeto}.txt'): 
+                            arquivo = open(f'grupos/{tituloProjeto}.txt', 'w', encoding='UTF-8')
                             arquivo.writelines(f'{montaEquipe(linha)}\n\n')
                             arquivo.writelines(f'Professores: {linha[i["profs"]]}\n\n')
                             arquivo.writelines(f'Descrição: {linha[i["descricao"]]}')
                             print ('**********************')
-                        if not os.path.exists(f'grupos/{tituloProjeto}/video.mp4'):
+                        if not os.path.exists(f'grupos/{tituloProjeto}.mp4'):
                             #download do video
                             url = linha[i['link1']] if len( linha[i['link1']]) >=2 else  linha[i['link2']]
                             if len(url) >=2 and isGoogleDriveLink(url):
                                 print (linha[i["tituloProj"]])
                                 print(url)
                                 print (adjustURLForDownload(url))
-                                download_file (adjustURLForDownload(url),f'grupos/{tituloProjeto}/video.mp4')
+                                download_file (adjustURLForDownload(url),f'grupos/{tituloProjeto}.mp4')
                     except Exception as e:
                         print (e)
+            cont += 1
+
+def tratarSomenteQuemNaoTemVideo ():
+    with open(r'dados.csv', encoding='utf-8') as csvfile:
+        cont = 1
+        leitor = csv.reader(csvfile, delimiter=',')
+        for linha in leitor:
+            if cont > 20 and cont <= 40:
+                if (not temVideo(linha) and temPermissao(linha)):
+                    try:    
+                        #criar pasta para esse grupo
+                        tituloProjeto = f'{linha[i["tituloProj"]].strip().replace(":", "-")}'
+                        tituloProjeto = tituloProjeto.replace('"', '').replace('|', '-').replace('/','-').replace('*','.')
+                        if not os.path.exists(f'grupos'):
+                            os.makedirs(f'grupos')
+                        #cria arquivo com titulo, integrantes etc
+                        if not os.path.exists(f'grupos/{tituloProjeto}.txt'): 
+                            arquivo = open(f'grupos/{tituloProjeto}.txt', 'w', encoding='UTF-8')
+                            arquivo.writelines(f'{montaEquipe(linha)}\n\n')
+                            arquivo.writelines(f'Professores: {linha[i["profs"]]}\n\n')
+                            arquivo.writelines(f'Descrição: {linha[i["descricao"]]}')
+                            print ('**********************')
+                        if not os.path.exists(f'grupos/{tituloProjeto}.mp4'):
+                            #download do video
+                            url = linha[i['link1']] if len( linha[i['link1']]) >=2 else  linha[i['link2']]
+                            if len(url) >=2 and isGoogleDriveLink(url):
+                                print (linha[i["tituloProj"]])
+                                print(url)
+                                print (adjustURLForDownload(url))
+                                download_file (adjustURLForDownload(url),f'grupos/{tituloProjeto}.mp4')
+                    except Exception as e:
+                        print (e)
+            cont += 1
 
 def main():
     tratarSomenteQuemTemVideo()
-    tratarSomenteQuemNaoTemVideo()
+    #tratarSomenteQuemNaoTemVideo()
 
 main()
 
